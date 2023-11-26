@@ -23,9 +23,6 @@ connection = psycopg2.connect(**db_params)
 # Create a cursor object to interact with the database
 cursor = connection.cursor()
 
-
-st.title("This is my webapp")
-
 # TODO: Create a function to initialize and return a PostgreSQL connection.
 
 def main():
@@ -40,16 +37,17 @@ def main():
     else:
         user_id = st.session_state["user_id"]
 
-        st.write('your user id is',user_id)
+        # st.write('your user id is',user_id)
         cursor.execute(f'SELECT * FROM account WHERE AID = {str(st.session_state["user_id"])};')
         user_info = cursor.fetchone()
-        st.write(f'Welcome back, you are a {user_info}')
+        # st.write(f'Welcome back, you are a {user_info}')
 
         # user info
         user_type = user_info[4]
 
         if (user_type == "Seller"):
             SellerMain()
+            
         elif(user_type == "Buyer"):
             BuyerMain()
 
@@ -60,8 +58,6 @@ def main():
             MechanicMain()
 
 
-        
-    
 
 if __name__ == "__main__":
     main()
