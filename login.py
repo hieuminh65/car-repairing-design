@@ -17,6 +17,12 @@ connection = psycopg2.connect(**db_params)
 # Create a cursor object to interact with the database
 cursor = connection.cursor()
 
+def valid_passwords(username: str, password: str) -> bool:
+    """Password must have at least 8 characters, 1 uppercase letter, 1 lowercase letter, and 1 number."""
+    return len(password) >= 8 and any(char.isdigit() for char in password) and any(
+        char.isupper() for char in password
+    ) and any(char.islower() for char in password)
+
 
 def login_success(message: str, username: str, user_id: int) -> None:
     st.success(message)
@@ -109,13 +115,13 @@ def login_form(
                     placeholder=create_password_placeholder,
                     help=create_password_help,
                     type="password",
-                    disabled=st.session_state["authenticated"],
+                    disabled=st.session_state["authenticated"]
                 )
 
-                 # select type
+                # select type
                 user_type = st.radio(
                     "What is your type",
-                    ["Seller", "Buyer",],
+                    ["Seller", "Buyer", "CarChecker", "Mechanic"],
                     horizontal=True
                 )
 
@@ -142,17 +148,30 @@ def login_form(
                         latest_account = cursor.fetchone()
                         userid = latest_account[0]
 
-                        # add to the seller/buyer table
                         if (user_type == 'Seller'):
                             cursor.execute(f'''INSERT INTO Seller (SellerID ,Total_Cars_Sold)
                                             VALUES
                                             ( '{userid}' ,'0');
                                             ''')
                             connection.commit()
-                        else:
+                        elif (user_type == 'Buyer'):
                             cursor.execute(f'''INSERT INTO Buyer (BuyerID, Total_Purchases)
                                             VALUES
                                             ('{userid}','0');
+                                            ''')
+                            connection.commit()
+                        
+                        elif (user_type == 'CarChecker'):
+                            cursor.execute(f'''INSERT INTO CarChecker (CheckerID, Specialization)
+                                            VALUES
+                                            ('{userid}','');
+                                            ''')
+                            connection.commit()
+                        
+                        elif (user_type == 'Mechanic'):
+                            cursor.execute(f'''INSERT INTO Mechanic (MechanicID, Expertise)
+                                            VALUES
+                                            ('{userid}','');
                                             ''')
                             connection.commit()
 
@@ -187,8 +206,6 @@ def login_form(
                     disabled=st.session_state["authenticated"],
                     type="primary",
                 ):
-                    st.write(username)
-                    st.write(password)
 
                     # TODO: Insert authentication logic for logging into an existing account using PostgreSQL.
                     cursor.execute('SELECT EXISTS(SELECT 1 FROM account WHERE username = %s);', (username,))

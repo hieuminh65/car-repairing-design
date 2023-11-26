@@ -47,3 +47,9 @@ def SellerMain():
                 st.success("Data successfully inserted into the database.")
             except Exception as e:
                 st.error(f"Error: Unable to insert data into the database. {e}")
+
+    back = st.button("Back to login", type="secondary")
+    if back:
+        st.session_state["authenticated"] = False
+        st.session_state["username"] = None
+        st.experimental_rerun()

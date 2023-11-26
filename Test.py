@@ -84,4 +84,21 @@ def DropTable(table_name):
 
 
 # get all rows from the table
-DropTable('employees')
+# DropTable('employees')
+
+## Drop all tables
+def drop_all_tables(cursor):
+    # Get a list of all tables
+    cursor.execute("""
+        SELECT table_name 
+        FROM information_schema.tables 
+        WHERE table_schema = 'public'
+    """)
+    tables = cursor.fetchall()
+
+    # Drop each table
+    for table in tables:
+        cursor.execute(f"DROP TABLE {table[0]} CASCADE")
+
+# Call the function
+drop_all_tables(cursor)
