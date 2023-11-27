@@ -178,7 +178,7 @@ def login_form(
                             connection.commit()
 
                         elif (user_type == 'Admin'):
-                            if secret_key == "admin":
+                            if secret_key == Config.SECRET_KEY:
                                 cursor.execute(f'''INSERT INTO Admin (AdminID)
                                                 VALUES
                                                 ('{userid}');
@@ -226,7 +226,6 @@ def login_form(
 
                     if not checked_user_exists:
                         st.error("You have not sign up")
-                        st.write('return query',checked_user_exists)
                     else:
                         cursor.execute(f'''SELECT EXISTS(SELECT 1 FROM account WHERE username = '{username}' AND password = '{password}');''')
                         password_correct = cursor.fetchone()[0]

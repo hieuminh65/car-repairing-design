@@ -8,3 +8,4 @@ class Config:
     USER = os.getenv('USER_DB')
     DATABASE = os.getenv('DATABASE')
     PASSWORD = os.getenv('PASSWORD')
+    SECRET_KEY = os.getenv('SECRET_KEY')
