@@ -1,6 +1,6 @@
 import streamlit as st
 import psycopg2
-
+import random
 
 ## init database connection
 from config import Config
@@ -118,10 +118,12 @@ def login_form(
                     disabled=st.session_state["authenticated"]
                 )
 
+                secret_key = st.text_input(label = "Enter the secret key (Only for Admin)", type="password")
+
                 # select type
                 user_type = st.radio(
                     "What is your type",
-                    ["Seller", "Buyer", "CarChecker", "Mechanic"],
+                    ["Seller", "Buyer", "CarChecker", "Mechanic", "Admin"],
                     horizontal=True
                 )
 
@@ -138,13 +140,13 @@ def login_form(
                                         ('{username}', '{password}', '{email}', '{user_type}');
                                         ''')
                         
-                        st.write(username, email, user_type)
-                        
+                        # connection.commit()
 
                         cursor.execute(f'''SELECT AID FROM Account
                                             ORDER BY AID DESC
                                             LIMIT 1;
                                        ''')
+                        
                         latest_account = cursor.fetchone()
                         userid = latest_account[0]
 
@@ -175,11 +177,21 @@ def login_form(
                                             ''')
                             connection.commit()
 
-
+                        elif (user_type == 'Admin'):
+                            if secret_key == "admin":
+                                cursor.execute(f'''INSERT INTO Admin (AdminID)
+                                                VALUES
+                                                ('{userid}');
+                                                ''')
+                                connection.commit()
+                            else:
+                                st.error("Wrong secret key")
+                                st.stop()
 
                         login_success(message=create_success_message, username=username, user_id=userid)
                     except Exception as err:
                         st.error(f'Register unsuccessful ')
+                        connection.rollback()
                         st.write(err)
 
         # Login to existing account

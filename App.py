@@ -40,7 +40,6 @@ def main():
         # st.write('your user id is',user_id)
         cursor.execute(f'SELECT * FROM account WHERE AID = {str(st.session_state["user_id"])};')
         user_info = cursor.fetchone()
-        # st.write(f'Welcome back, you are a {user_info}')
 
         # user info
         user_type = user_info[4]
@@ -56,6 +55,9 @@ def main():
 
         elif (user_type == "Mechanic"):
             MechanicMain()
+
+        elif (user_type == "Admin"):
+            st.write("You can know access the database directly and see the transactions")
 
 
 

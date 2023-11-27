@@ -32,6 +32,12 @@ def create_tables():
                 Type VARCHAR(50) NOT NULL
             );
             ''',
+            # Admin table
+            '''
+            CREATE TABLE Admin (
+                AdminID INT PRIMARY KEY REFERENCES Account(AID) ON DELETE CASCADE
+            );
+            ''',
 
             # Seller table
             '''
@@ -114,6 +120,24 @@ def create_tables():
                 SellerID INT REFERENCES Seller(SellerID),
                 GCID INT REFERENCES carunchecked(UCID)
             );
+            '''
+
+            # Trigger
+            '''
+            CREATE OR REPLACE FUNCTION grant_select_to_new_admin()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                -- Grant SELECT privilege to the new admin user
+                EXECUTE 'GRANT SELECT ON ALL TABLES IN SCHEMA public TO ' || NEW.AdminID || ';'
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+            '''
+            '''
+            CREATE TRIGGER after_insert_admin
+            AFTER INSERT ON Admin
+            FOR EACH ROW
+            EXECUTE FUNCTION grant_select_to_new_admin();
             '''
         ]
 
