@@ -163,20 +163,6 @@ def login_form(
                                             ''')
                             connection.commit()
                         
-                        elif (user_type == 'CarChecker'):
-                            cursor.execute(f'''INSERT INTO CarChecker (CheckerID, Specialization)
-                                            VALUES
-                                            ('{userid}','');
-                                            ''')
-                            connection.commit()
-                        
-                        elif (user_type == 'Mechanic'):
-                            cursor.execute(f'''INSERT INTO Mechanic (MechanicID, Expertise)
-                                            VALUES
-                                            ('{userid}','');
-                                            ''')
-                            connection.commit()
-
                         elif (user_type == 'Admin'):
                             if secret_key == Config.SECRET_KEY:
                                 cursor.execute(f'''INSERT INTO Admin (AdminID)
