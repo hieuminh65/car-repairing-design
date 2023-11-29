@@ -1,7 +1,6 @@
 import streamlit as st
 import psycopg2
 import pandas as pd
-from config import Config
 
 def fetch_and_display_table(cursor, table_name):
     try:
@@ -40,10 +39,10 @@ def BuyerMain():
     user_id = st.session_state.get("user_id", "default_user_id")
 
     db_params = {
-        "host": Config.HOST,
-        "database": Config.DATABASE,
-        "user": Config.USER,
-        "password": Config.PASSWORD
+        "host": "localhost",
+        "database": "final_project",
+        "user": "postgres",
+        "password": "Toanposgre"
     }
 
     connection = connect_db(db_params)

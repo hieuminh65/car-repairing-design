@@ -1,17 +1,16 @@
 import streamlit as st
 import psycopg2
 import pandas as pd
-from config import Config
 
 
 def MechanicMain():
     user_id = st.session_state["user_id"]
 
     db_params = {
-        "host": Config.HOST,
-        "database": Config.DATABASE,
-        "user": Config.USER,
-        "password": Config.PASSWORD
+        "host": "localhost",
+        "database": "final_project",
+        "user": "postgres",
+        "password": "Toanposgre"
     }
 
     try:
@@ -108,3 +107,6 @@ def MechanicMain():
             #         st.table(df_display)
             # except Exception as e:
             #     st.error(f"Error: Unable to fetch the updated data. {e}")
+
+
+

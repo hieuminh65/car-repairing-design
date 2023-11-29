@@ -1,12 +1,11 @@
 import psycopg2
-import random
+
 # Database connection parameters
-from config import Config
 db_params = {
-    "host": Config.HOST,
-    "database": Config.DATABASE,
-    "user": Config.USER,
-    "password": Config.PASSWORD
+    "host": "localhost",
+    "database": "final_project",
+    "user": "postgres",
+    "password": "Toanposgre"
 }
 
 # Establish a connection to the PostgreSQL server
@@ -18,81 +17,92 @@ cursor = connection.cursor()
 def insert_dummy_data():
     try:
         # SQL queries to insert dummy data
-        queries = []
+        queries = [
+            # Insert into accounts
+            '''
+            INSERT INTO account (username, password, email, type) VALUES 
+            ('toan mechanic', 'Abcd12345@', 'toanmechanic@gmail.com', 'Mechanic'),
+            ('toan carchecker', 'Abcd12345@', 'toancarchecker@gmail.com', 'CarChecker'),
+            ('toan buyer', 'Abcd12345@', 'toanbuyer@gmail.com', 'Buyer'),
+            ('toan seller', 'Abcd12345@', 'toanseller@gmail.com', 'Seller');
+            ''',
 
-        # Insert data into Account table
-        for i in range(10, 21):
-            account_type = random.choice(['Seller', 'Buyer', 'CarChecker', 'Mechanic'])
-            queries.append(f"INSERT INTO Account (Username, Password, Email, Type) VALUES ('user{i}', 'pass{i}', 'user{i}@example.com', '{account_type}');")
+            # Insert data into CarChecker table
+            '''
+            INSERT INTO CarChecker (CheckerID, Specialization) VALUES
+            (2, 'I am a great car checker');
+            ''',
 
-        # Insert data into Seller table
-        for i in range(1, 11):
-            total_cars_sold = random.randint(1, 50)
-            queries.append(f"INSERT INTO Seller (SellerID, Total_Cars_Sold) VALUES ({i}, {total_cars_sold});")
+            # Insert data into Mechanic table
+            '''
+            INSERT INTO Mechanic (mechanicid, Expertise) VALUES
+            (1, 'I am a great car mechanic');
+            ''',
 
-        # Insert data into Buyer table
-        for i in range(1, 11):
-            total_purchases = random.randint(1, 20)
-            queries.append(f"INSERT INTO Buyer (BuyerID, Total_Purchases) VALUES ({i}, {total_purchases});")
+            # Seller
+            '''
+            INSERT INTO seller (sellerid, total_cars_sold) VALUES 
+            (4, 0);
+            '''
+            
+            # Buyer
+            '''
+            INSERT INTO buyer (buyerid, total_purchases) VALUES 
+            (3, 0);
+            '''
+                
+            # Insert data into Carunchecked
+            '''
+            INSERT INTO Carunchecked (ucid, description, model, year, status, seller_aid, uncheck) VALUES
+            (1, 'A new car', 'SUV Model X', 2020, 'New', 4, FALSE),
+            (2, 'An old, 5000 miles car', 'Coupe Model Y', 2021, 'Used', 4, FALSE),
+            (3, 'A broken car', 'Sedan Model Z', 2019, 'Damaged', 4, FALSE),
+            (4, 'A well-maintained family car', 'Minivan Model A', 2018, 'Used', 4, FALSE),
+            (5, 'A sports car with low mileage', 'Sports Model B', 2022, 'New', 4, TRUE),
+            (6, 'A vintage car, needs some work', 'Classic Model C', 1965, 'Damaged', 4, FALSE),
+            (7, 'An electric car, barely used', 'Electric Model D', 2023, 'New', 4, FALSE),
+            (8, 'A compact city car', 'Hatchback Model E', 2021, 'Used', 4, TRUE),
+            (9, 'A luxury car, recently serviced', 'Luxury Model F', 2020, 'Used', 4, TRUE),
+            (10, 'An off-road vehicle, minor exterior damage', '4x4 Model G', 2019, 'Damaged', 4, TRUE);
+            ''',
 
-        # Insert data into CarChecker table
-        specializations = ['SUV', 'Sedan', 'Coupe', 'Convertible', 'Hatchback']
-        for i in range(1, 11):
-            specialization = random.choice(specializations)
-            queries.append(f"INSERT INTO CarChecker (CheckerID, Specialization) VALUES ({i}, '{specialization}');")
+            # great car table
+            '''
+            INSERT INTO greatcar (ucid) VALUES
+            (1),
+            (7);
+            ''',
 
-        # Insert data into Mechanic table
-        expertises = ['Engine Repair', 'Transmission', 'Brakes', 'Electrical', 'Bodywork']
-        for i in range(1, 11):
-            expertise = random.choice(expertises)
-            queries.append(f"INSERT INTO Mechanic (MechanicID, Expertise) VALUES ({i}, '{expertise}');")
+            # broken car
+            '''
+            INSERT INTO brokencar (ucid) VALUES
+            (2),
+            (4);
+            ''',
 
-        # Insert data into CarUnchecked table
-        for i in range(1, 11):
-            year = random.randint(2010, 2023)
-            seller_aid = random.randint(1, 10)
-            status = random.choice(['Pending', 'Checked'])
-            uncheck = 'TRUE' if status == 'Pending' else 'FALSE'
-            queries.append(f"INSERT INTO CarUnchecked (Description, Model, Year, Status, Seller_AID, Uncheck) VALUES ('Model {i}', 'Model {i}', {year}, '{status}', {seller_aid}, {uncheck});")
+            # Insert data into CarParts table
+            '''
+            INSERT INTO CarParts (cid, mechanicid, partname) VALUES
+            (3, 1, 'To be updated...'),
+            (6, 1, 'To be updated...');
+            ''',
+        ]
 
-        # Insert data into GreatCar and BrokenCar tables
-        for i in range(1, 11):
-            checker_id = random.randint(1, 10)
-            if i % 2 == 0:
-                queries.append(f"INSERT INTO GreatCar (UCID, CheckerID) VALUES ({i}, {checker_id});")
-            else:
-                queries.append(f"INSERT INTO BrokenCar (UCID, CheckerID) VALUES ({i}, {checker_id});")
-
-        # Insert data into CarParts table
-        part_names = ['Engine', 'Transmission', 'Brakes', 'Wheels', 'Exhaust']
-        for i in range(1, 11):
-            cid = random.randint(1, 10)
-            mechanic_id = random.randint(1, 10)
-            part_name = random.choice(part_names)
-            queries.append(f"INSERT INTO CarParts (CID, MechanicID, PartName) VALUES ({cid}, {mechanic_id}, '{part_name}');")
-
-        # Insert data into Transaction table
-        for i in range(1, 11):
-            buyer_id = random.randint(1, 10)
-            seller_id = random.randint(1, 10)
-            gcid = random.randint(1, 10)
-            queries.append(f"INSERT INTO Transaction (BuyerID, SellerID, GCID) VALUES ({buyer_id}, {seller_id}, {gcid});")
-
-        # Execute each query
+        # Execute each query to insert dummy data
         for query in queries:
             cursor.execute(query)
 
-        # Commit the changes
+        # Commit the changes to the database
         connection.commit()
 
     except (Exception, psycopg2.Error) as error:
         print("Error inserting dummy data:", error)
-
 
     finally:
         # Close the cursor and the database connection
         if connection:
             cursor.close()
             connection.close()
+
 
 insert_dummy_data()

@@ -1,16 +1,15 @@
 import streamlit as st
 import psycopg2
 import pandas as pd
-from config import Config
 
 def CarCheckerMain():
     user_id = st.session_state["user_id"]
 
     db_params = {
-        "host": Config.HOST,
-        "database": Config.DATABASE,
-        "user": Config.USER,
-        "password": Config.PASSWORD
+        "host": "localhost",
+        "database": "final_project",
+        "user": "postgres",
+        "password": "Toanposgre"
     }
 
     try:
@@ -76,3 +75,4 @@ def CarCheckerMain():
         finally:
             # Refetching the data after the update
             st.experimental_rerun()
+
