@@ -116,6 +116,8 @@ def BuyerMain():
                 print()
 
     connection.close()
-
-if __name__ == "__main__":
-    BuyerMain()
+    back = st.button(":back:", type="secondary")
+    if back:
+        st.session_state["authenticated"] = False
+        st.session_state["username"] = None
+        st.experimental_rerun()

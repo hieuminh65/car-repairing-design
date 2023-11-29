@@ -50,7 +50,7 @@ def SellerMain():
                         latest_checkerid = latest_row[5]
 
                         connection.commit()
-                        st.success("Data successfully inserted into the database.")
+                        st.success("Data successfully inserted into the database. Waiting for checker to approve.")
                     else:
                         st.error("Error: No data returned from the INSERT operation.")
             except Exception as e:
