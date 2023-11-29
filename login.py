@@ -1,6 +1,6 @@
 import streamlit as st
 import psycopg2
-from SecurityCheck import check_password_strength
+from SecurityCheck import check_password_strength, check_email
 
 ## init database connection
 from config import Config
@@ -38,10 +38,10 @@ def login_form(
     user_tablename: str = "users",
     username_col: str = "username",
     password_col: str = "password",
-    create_title: str = "Create new account :baby: ",
-    login_title: str = "Login to existing account :prince: ",
+    create_title: str = "Create new account",
+    login_title: str = "Login to existing account",
     allow_guest: bool = True,
-    guest_title: str = "Guest login :ninja: ",
+    guest_title: str = "Guest login",
     create_username_label: str = "Create a unique username",
     create_email_label: str = "Create a unique email",
     create_email_placeholder: str = "Create a unique email",
@@ -132,9 +132,13 @@ def login_form(
                     label=create_submit_label,
                     type="primary",
                     disabled=st.session_state["authenticated"],
-                ):
+                ):  
+                    if email == '' or not check_email(email):
+                        st.error("Please fill in your correct email")
+                        st.stop()
+
                     if not check_password_strength(password):
-                        st.toast('Please use a stronger password!', icon="🚨")
+                        st.error('Please use a stronger password with at least 8 characters long, 1 alphabets, 1 numbers, and 1 special character', icon="🚨")
                         st.stop()
                         
                     try:

@@ -19,3 +19,13 @@ def check_password_strength(password):
         return True
     else:
         return False
+    
+def check_email(email):
+    """
+    Check if the email is valid.
+    Returns True if the email is valid, False otherwise.
+    """
+    if re.search("[a-zA-Z0-9]+@[a-zA-Z]+\.[a-zA-Z]+", email):
+        return True
+    else:
+        return False

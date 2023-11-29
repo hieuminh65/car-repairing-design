@@ -108,3 +108,9 @@ def MechanicMain():
             #         st.table(df_display)
             # except Exception as e:
             #     st.error(f"Error: Unable to fetch the updated data. {e}")
+    
+    back = st.button(":back:", type="secondary")
+    if back:
+        st.session_state["authenticated"] = False
+        st.session_state["username"] = None
+        st.experimental_rerun()
