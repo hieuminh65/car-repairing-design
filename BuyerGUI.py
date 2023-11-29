@@ -6,7 +6,14 @@ from config import Config
 def fetch_and_display_table(cursor, table_name):
     try:
         if table_name == 'carparts':
-            cursor.execute('''SELECT * FROM carparts JOIN carunchecked ON cid = ucid ;''')
+            cursor.execute('''SELECT * , partname AS partdescription FROM carparts JOIN carunchecked ON cid = ucid ;''')
+
+            data = cursor.fetchall()
+            colnames = [desc[0] for desc in cursor.description]
+            df = pd.DataFrame(data, columns=colnames)
+            st.table(df[["cid", "partname", "model", "year"]])
+            return df  # Return DataFrame for further use
+
         else:
             cursor.execute("""
                 SELECT CarUnchecked.UCID, CarUnchecked.description, CarUnchecked.model, 
@@ -14,11 +21,11 @@ def fetch_and_display_table(cursor, table_name):
                 FROM greatcar 
                 JOIN CarUnchecked ON greatcar.UCID = CarUnchecked.UCID;
             """)
-        data = cursor.fetchall()
-        colnames = [desc[0] for desc in cursor.description]
-        df = pd.DataFrame(data, columns=colnames)
-        st.dataframe(df, width=1080)
-        return df  # Return DataFrame for further use
+            data = cursor.fetchall()
+            colnames = [desc[0] for desc in cursor.description]
+            df = pd.DataFrame(data, columns=colnames)
+            st.table(df)
+            return df  # Return DataFrame for further use
     except Exception as e:
         st.error(f"Error: Unable to fetch data from {table_name}. {e}")
 
@@ -78,18 +85,18 @@ def BuyerMain():
                 st.error(f"Error: Unable to complete the purchase. {e}")
                 connection.rollback()
 
+
     # Buy a Car Part
     with st.form(key='buy_part_form'):
         st.write("Buy a Car Part")
 
         # part_id_to_buy is actually the UICD in carunchecked
-        part_id_to_buy = st.selectbox('Choose the ID of the part to buy:', df_parts['cid'].values)  # Assuming there's a 'PartID' column
+        part_id_to_buy = st.selectbox('Choose the ID of the part to buy:', df_parts['cid'].values.astype(int))  # Assuming there's a 'PartID' column
         submit_button_part = st.form_submit_button(label='Buy Part')
-
-        sellerId = df_parts[df_parts['cid'] == part_id_to_buy]['seller_aid']
 
         if submit_button_part:
             # Transaction logic for buying a part
+            sellerId = df_parts[df_parts['cid'] == part_id_to_buy]['seller_aid']
             try:
                 with connection.cursor() as cursor:
                     cursor.execute("""
@@ -100,18 +107,15 @@ def BuyerMain():
                     cursor.execute(f"DELETE FROM carparts WHERE cid = {int(part_id_to_buy)} ")
                     connection.commit()
                     st.success(f"You have successfully purchased the part with ID {part_id_to_buy}.")
-                    st.experimental_rerun()
             except Exception as e:
                 st.error(f"Error: Unable to complete the purchase. {e}")
                 connection.rollback()
 
-    connection.close()
+            finally:
+                st.experimental_rerun()
+                print()
 
-    back = st.button("Back to login", type="secondary")
-    if back:
-        st.session_state["authenticated"] = False
-        st.session_state["username"] = None
-        st.experimental_rerun()
+    connection.close()
 
 if __name__ == "__main__":
     BuyerMain()

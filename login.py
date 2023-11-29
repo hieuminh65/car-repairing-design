@@ -1,6 +1,6 @@
 import streamlit as st
 import psycopg2
-import random
+from SecurityCheck import check_password_strength
 
 ## init database connection
 from config import Config
@@ -123,7 +123,7 @@ def login_form(
                 # select type
                 user_type = st.radio(
                     "What is your type",
-                    ["Seller", "Buyer", "CarChecker", "Mechanic", "Admin"],
+                    ["Seller", "Buyer", "Admin"],
                     horizontal=True
                 )
 
@@ -133,7 +133,10 @@ def login_form(
                     type="primary",
                     disabled=st.session_state["authenticated"],
                 ):
-                    # TODO: Insert authentication logic for creating a new account using PostgreSQL.
+                    if not check_password_strength(password):
+                        st.toast('Please use a stronger password!', icon="🚨")
+                        st.stop()
+                        
                     try:
                         cursor.execute(f'''INSERT INTO account (username, password, email, type)
                                         VALUES

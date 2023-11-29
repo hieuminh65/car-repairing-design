@@ -12,7 +12,6 @@ def SellerMain():
         "password": Config.PASSWORD
     }
 
-    # Setup a connection. Always remember to handle connection exceptions in production code
     try:
         connection = psycopg2.connect(**db_params)
     except Exception as e:
@@ -37,19 +36,22 @@ def SellerMain():
         
         if submit_button:
             try:
-                
 
                 with connection.cursor() as cursor:
-                    insert_query = '''INSERT INTO CarUnchecked (Description, Model, Year, Status, Seller_AID)
-                                    VALUES (%s, %s, %s, %s, %s);'''
-                    cursor.execute(insert_query, (description, model, year, status, user_id ))
-                    connection.commit()
-                st.success("Data successfully inserted into the database.")
+                    insert_query = '''INSERT INTO CarUnchecked (Description, Model, Year, Status, Seller_AID, uncheck)
+                                      VALUES (%s, %s, %s, %s, %s, TRUE)
+                                      RETURNING *;'''
+                    cursor.execute(insert_query, (description, model, year, status, user_id))
+
+                    latest_row = cursor.fetchone()
+
+                    if latest_row is not None:
+                        latest_ucid = latest_row[0]
+                        latest_checkerid = latest_row[5]
+
+                        connection.commit()
+                        st.success("Data successfully inserted into the database.")
+                    else:
+                        st.error("Error: No data returned from the INSERT operation.")
             except Exception as e:
                 st.error(f"Error: Unable to insert data into the database. {e}")
-
-    back = st.button("Back to login", type="secondary")
-    if back:
-        st.session_state["authenticated"] = False
-        st.session_state["username"] = None
-        st.experimental_rerun()
