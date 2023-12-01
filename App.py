@@ -9,12 +9,11 @@ from CarCheckerGUI import CarCheckerMain
 from MechanicGUI import MechanicMain
 
 ## init database connection
-from config import Config
 db_params = {
-    "host": Config.HOST,
-    "database": Config.DATABASE,
-    "user": Config.USER,
-    "password": Config.PASSWORD
+    "host": "localhost",
+    "database": "final_project",
+    "user": "postgres",
+    "password": "Toanposgre"
 }
 
 # Establish a connection to the PostgreSQL server
@@ -22,6 +21,7 @@ connection = psycopg2.connect(**db_params)
 
 # Create a cursor object to interact with the database
 cursor = connection.cursor()
+
 
 st.title("Funny Car Shop")
 
@@ -53,7 +53,7 @@ def main():
 
         elif (user_type == "Mechanic"):
             MechanicMain()
-            
+
 
 if __name__ == "__main__":
     main()

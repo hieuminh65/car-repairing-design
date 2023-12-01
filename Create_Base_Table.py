@@ -1,12 +1,13 @@
 import psycopg2
+from config import Config
 
     
 # Database connection parameters
 db_params = {
-    "host": "localhost",
-    "database": "final_project",
-    "user": "postgres",
-    "password": "Toanposgre"
+    "host": Config.HOST,
+    "database": Config.DATABASE,
+    "user": Config.USER,
+    "password": Config.PASSWORD
 }
 
 # Establish a connection to the PostgreSQL server
@@ -29,6 +30,13 @@ def create_tables():
                 Password VARCHAR(100) NOT NULL,
                 Email VARCHAR(100) NOT NULL,
                 Type VARCHAR(50) NOT NULL
+            );
+            ''',
+
+            # Admin table
+            '''
+            CREATE TABLE Admin (
+                AdminID INT PRIMARY KEY REFERENCES Account(AID) ON DELETE CASCADE
             );
             ''',
 
@@ -111,6 +119,23 @@ def create_tables():
                 SellerID INT REFERENCES Seller(SellerID),
                 GCID INT REFERENCES carunchecked(UCID)
             );
+            '''
+            # Trigger
+            '''
+            CREATE OR REPLACE FUNCTION grant_select_to_new_admin()
+            RETURNS TRIGGER AS $$
+            BEGIN
+                -- Grant SELECT privilege to the new admin user
+                EXECUTE 'GRANT SELECT ON ALL TABLES IN SCHEMA public TO ' || NEW.AdminID || ';'
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+            '''
+            '''
+            CREATE TRIGGER after_insert_admin
+            AFTER INSERT ON Admin
+            FOR EACH ROW
+            EXECUTE FUNCTION grant_select_to_new_admin();
             '''
         ]
 

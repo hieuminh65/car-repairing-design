@@ -1,16 +1,17 @@
 import streamlit as st
 import psycopg2
 import pandas as pd
+from config import Config
 
 
 def MechanicMain():
     user_id = st.session_state["user_id"]
 
     db_params = {
-        "host": "localhost",
-        "database": "final_project",
-        "user": "postgres",
-        "password": "Toanposgre"
+        "host": Config.HOST,
+        "database": Config.DATABASE,
+        "user": Config.USER,
+        "password": Config.PASSWORD
     }
 
     try:

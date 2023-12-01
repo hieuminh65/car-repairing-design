@@ -1,15 +1,16 @@
 import streamlit as st
 import psycopg2
+from config import Config
 
 
 def SellerMain():
     user_id = st.session_state["user_id"]
 
     db_params = {
-        "host": "localhost",
-        "database": "final_project",
-        "user": "postgres",
-        "password": "Toanposgre"
+        "host": Config.HOST,
+        "database": Config.DATABASE,
+        "user": Config.USER,
+        "password": Config.PASSWORD
     }
 
     # Setup a connection. Always remember to handle connection exceptions in production code

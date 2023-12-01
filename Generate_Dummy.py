@@ -1,11 +1,12 @@
 import psycopg2
+from config import Config
 
 # Database connection parameters
 db_params = {
-    "host": "localhost",
-    "database": "final_project",
-    "user": "postgres",
-    "password": "Toanposgre"
+    "host": Config.HOST,
+    "database": Config.DATABASE,
+    "user": Config.USER,
+    "password": Config.PASSWORD
 }
 
 # Establish a connection to the PostgreSQL server

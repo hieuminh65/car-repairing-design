@@ -1,15 +1,15 @@
 import streamlit as st
 import psycopg2
-
+from config import Config
 # check password strength
 from SecurityCheck import check_password_strength
 
 ## init database connection
 db_params = {
-    "host": "localhost",
-    "database": "final_project",
-    "user": "postgres",
-    "password": "Toanposgre"
+    "host": Config.HOST,
+    "database": Config.DATABASE,
+    "user": Config.USER,
+    "password": Config.PASSWORD
 }
 
 # Establish a connection to the PostgreSQL server
@@ -186,17 +186,13 @@ def login_form(
                     disabled=st.session_state["authenticated"],
                     type="primary",
                 ):
-                    st.write(username)
-                    st.write(password)
 
-                    # TODO: Insert authentication logic for logging into an existing account using PostgreSQL.
                     cursor.execute('SELECT EXISTS(SELECT 1 FROM account WHERE username = %s);', (username,))
                     checked_user_exists = cursor.fetchone()[0]
 
 
                     if not checked_user_exists:
                         st.error("You have not sign up")
-                        st.write('return query',checked_user_exists)
                     else:
                         cursor.execute(f'''SELECT EXISTS(SELECT 1 FROM account WHERE username = '{username}' AND password = '{password}');''')
                         password_correct = cursor.fetchone()[0]
@@ -228,5 +224,4 @@ def login_main():
         login_form(
             create_username_placeholder="Username will be visible in the global leaderboard.",
             create_password_placeholder="⚠️ Password will be stored as plain text. You won't be able to recover it if you forget.",
-            guest_submit_label="Play as a guest ⚠️ Scores won't be saved",
         )
