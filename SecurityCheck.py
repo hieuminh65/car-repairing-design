@@ -10,8 +10,6 @@ def check_password_strength(password):
     if len(password) < 8:
         return False
 
-    # Check for the presence of both alphabets and numbers
-    # Check for the presence of alphabets, numbers, and special characters
     if (re.search("[a-z]", password) and
         re.search("[A-Z]", password) and
         re.search("[0-9]", password) and

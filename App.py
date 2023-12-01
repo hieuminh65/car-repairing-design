@@ -1,14 +1,13 @@
 import streamlit as st
 import psycopg2
 from config import Config
-# login function
+
 from login import login_main
 from SellerGUI import SellerMain
 from BuyerGUI import BuyerMain
 from CarCheckerGUI import CarCheckerMain
 from MechanicGUI import MechanicMain
 
-## init database connection
 db_params = {
     "host": Config.HOST,
     "database": Config.DATABASE,
@@ -16,10 +15,8 @@ db_params = {
     "password": Config.PASSWORD
 }
 
-# Establish a connection to the PostgreSQL server
 connection = psycopg2.connect(**db_params)
 
-# Create a cursor object to interact with the database
 cursor = connection.cursor()
 
 

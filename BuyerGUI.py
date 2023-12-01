@@ -57,7 +57,7 @@ def BuyerMain():
             st.subheader("Available Car Parts")
             df_parts = fetch_and_display_table(cursor, "carparts")
     except Exception as e:
-        st.error(f"Error: Unable to fetch data from the database.")
+        st.error(f"No car available.")
         print(e)
         st.stop()
 
@@ -110,9 +110,6 @@ def BuyerMain():
                 print(e)
                 connection.rollback()
 
-            finally:
-                st.rerun()
-                print()
 
     connection.close()
 

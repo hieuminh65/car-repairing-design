@@ -61,8 +61,6 @@ def MechanicMain():
                         )
 
                     else:
-                        st.write(f"ID {row['ucid']} is False. Do something else here.")
-
                         st.write('car part', row["carPart"])
                         cursor.execute(f"""
                             INSERT INTO CarParts (cid, mechanicid, partname)
