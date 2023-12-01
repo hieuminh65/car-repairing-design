@@ -1,8 +1,8 @@
 import psycopg2
+from config import Config
 
     
 # Database connection parameters
-from config import Config
 db_params = {
     "host": Config.HOST,
     "database": Config.DATABASE,
@@ -32,6 +32,7 @@ def create_tables():
                 Type VARCHAR(50) NOT NULL
             );
             ''',
+
             # Admin table
             '''
             CREATE TABLE Admin (
@@ -80,7 +81,7 @@ def create_tables():
                 Year INT NOT NULL,
                 Status VARCHAR(50) NOT NULL,
                 Seller_AID INT REFERENCES Seller(SellerID),
-                Uncheck BOOLEAN
+                Uncheck BOOLEAN DEFAULT TRUE
             );
             ''',
 
@@ -88,8 +89,7 @@ def create_tables():
             '''
             CREATE TABLE GreatCar (
                 GCID SERIAL PRIMARY KEY,
-                UCID INT REFERENCES CarUnchecked(UCID),
-                CheckerID INT REFERENCES CarChecker(CheckerID)
+                UCID INT REFERENCES CarUnchecked(UCID)
             );
             ''',
 
@@ -97,8 +97,7 @@ def create_tables():
             '''
             CREATE TABLE BrokenCar (
                 BCID SERIAL PRIMARY KEY,
-                UCID INT REFERENCES CarUnchecked(UCID),
-                CheckerID INT REFERENCES CarChecker(CheckerID)
+                UCID INT REFERENCES CarUnchecked(UCID)
             );
             ''',
 
@@ -121,15 +120,13 @@ def create_tables():
                 GCID INT REFERENCES carunchecked(UCID)
             );
             '''
-
             # Trigger
             '''
             CREATE OR REPLACE FUNCTION grant_select_to_new_admin()
             RETURNS TRIGGER AS $$
             BEGIN
                 -- Grant SELECT privilege to the new admin user
-                EXECUTE 'GRANT SELECT ON ALL TABLES IN SCHEMA public TO ' || NEW.AdminID || ';'
-                RETURN NEW;
+                EXECUTE 'GRANT SELECT ON ALL TABLES IN SCHEMA public TO ' || quote_ident(NEW.AdminID::text) || ';';
             END;
             $$ LANGUAGE plpgsql;
             '''
@@ -151,10 +148,5 @@ def create_tables():
     except (Exception, psycopg2.Error) as error:
         print("Error creating tables:", error)
 
-    finally:
-        # Close the cursor and the database connection
-        if connection:
-            cursor.close()
-            connection.close()
 
 create_tables()

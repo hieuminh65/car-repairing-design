@@ -19,12 +19,12 @@ def CarCheckerMain():
         st.error(f"Error: Unable to connect to the database. Check your database credentials. {e}")
         st.stop()
 
-    st.title("Car Accepted")
+    st.title("Cars Waitlist")
     
     # Fetch and display data
     try:
         with connection.cursor() as cursor:
-            cursor.execute("SELECT * FROM carunchecked WHERE uncheck = True;")
+            cursor.execute("SELECT * FROM carunchecked WHERE uncheck = TRUE;")
             data = cursor.fetchall()
             colnames = [desc[0] for desc in cursor.description]
     except Exception as e:
@@ -49,13 +49,11 @@ def CarCheckerMain():
                 for index, row in edited_df.iterrows():
                     
                     if row['isCarGood']:
-                        # Placeholder for action when 'isCarGood' is True
-                        st.write(f"ID {row['ucid']} is True. Do something here.")
-                        
+
                         # Write SQL query to add to greatcar table
                         cursor.execute(f"""
-                            INSERT INTO greatcar (ucid, checkerid)
-                            VALUES ( {int(row['ucid'])}, {int(user_id)} );
+                            INSERT INTO greatcar (ucid)
+                            VALUES ( {int(row['ucid'])} );
                         """)
         
                     else:
@@ -64,8 +62,8 @@ def CarCheckerMain():
 
                         # query to add to BrokenCar
                         cursor.execute(f"""
-                            INSERT INTO brokencar (ucid, checkerid)
-                            VALUES ( {int(row['ucid'])}, {int(user_id)} );
+                            INSERT INTO brokencar (ucid)
+                            VALUES ( {int(row['ucid'])});
                         """)
                         
                 # Updating all 'Uncheck' values to False
@@ -77,20 +75,13 @@ def CarCheckerMain():
 
         finally:
             # Refetching the data after the update
-            try:
-                with connection.cursor() as cursor:
-                    cursor.execute("SELECT * FROM carunchecked WHERE uncheck = True;")
-                    data = cursor.fetchall()
-                    colnames = [desc[0] for desc in cursor.description]
-                    df = pd.DataFrame(data, columns=colnames)
-                    df_display = df.drop(columns=['uncheck'])
-                    df_display['isCarGood'] = False
-                    st.table(df_display)
-            except Exception as e:
-                st.error(f"Error: Unable to fetch the updated data. {e}")
-    
-    back = st.button("Back to login", type="secondary")
+            st.experimental_rerun()
+
+
+
+    back = st.button(":back:", type="secondary")
     if back:
         st.session_state["authenticated"] = False
         st.session_state["username"] = None
         st.experimental_rerun()
+
