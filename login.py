@@ -1,9 +1,10 @@
 import streamlit as st
 import psycopg2
+from config import Config
 from SecurityCheck import check_password_strength, check_email
 
+
 ## init database connection
-from config import Config
 db_params = {
     "host": Config.HOST,
     "database": Config.DATABASE,
@@ -16,12 +17,6 @@ connection = psycopg2.connect(**db_params)
 
 # Create a cursor object to interact with the database
 cursor = connection.cursor()
-
-def valid_passwords(username: str, password: str) -> bool:
-    """Password must have at least 8 characters, 1 uppercase letter, 1 lowercase letter, and 1 number."""
-    return len(password) >= 8 and any(char.isdigit() for char in password) and any(
-        char.isupper() for char in password
-    ) and any(char.islower() for char in password)
 
 
 def login_success(message: str, username: str, user_id: int) -> None:
@@ -38,8 +33,10 @@ def login_form(
     user_tablename: str = "users",
     username_col: str = "username",
     password_col: str = "password",
-    create_title: str = "Create new account",
-    login_title: str = "Login to existing account",
+    create_title: str = "Create new account :baby: ",
+    login_title: str = "Login to existing account :prince: ",
+    allow_guest: bool = False,
+    guest_title: str = "Guest login :ninja: ",
     create_username_label: str = "Create a unique username",
     create_email_label: str = "Create a unique email",
     create_email_placeholder: str = "Create a unique email",
@@ -103,15 +100,13 @@ def login_form(
                     placeholder=create_password_placeholder,
                     help=create_password_help,
                     type="password",
-                    disabled=st.session_state["authenticated"]
+                    disabled=st.session_state["authenticated"],
                 )
 
-                secret_key = st.text_input(label = "Enter the secret key (Only for Admin)", type="password")
-
-                # select type
+                 # select type
                 user_type = st.radio(
                     "What is your type",
-                    ["Seller", "Buyer", "Admin"],
+                    ["Seller", "Buyer",],
                     horizontal=True
                 )
 
@@ -128,51 +123,38 @@ def login_form(
                     if not check_password_strength(password):
                         st.error('Please use a stronger password with at least 8 characters long, 1 alphabets, 1 numbers, and 1 special character', icon="🚨")
                         st.stop()
-                        
+
+                    # TODO: Insert authentication logic for creating a new account using PostgreSQL.
                     try:
                         cursor.execute('''INSERT INTO account (username, password, email, type)
-                                        VALUES (%s, %s, %s, %s)
-                                        RETURNING AID;''',
-                                    (username, password, email, user_type))
-                        
-                        # connection.commit()
 
-                        cursor.execute(f'''SELECT AID FROM Account
-                                            ORDER BY AID DESC
-                                            LIMIT 1;
-                                       ''')
-                        
-                        latest_account = cursor.fetchone()
-                        userid = latest_account[0]
+                                          VALUES (%s, %s, %s, %s)
+                                          RETURNING AID;''',
+                                       (username, password, email, user_type))
 
-                        if (user_type == 'Seller'):
+                        st.write(username, email, user_type)
+
+                        user_id = cursor.fetchone()[0]
+
+                        # add to the seller/buyer table
+                        if user_type == 'Seller':
                             cursor.execute(f'''INSERT INTO Seller (SellerID ,Total_Cars_Sold)
                                             VALUES
-                                            ( '{userid}' ,'0');
+                                            ( '{user_id}' ,'0');
                                             ''')
                             connection.commit()
-                        elif (user_type == 'Buyer'):
+                        else:
                             cursor.execute(f'''INSERT INTO Buyer (BuyerID, Total_Purchases)
                                             VALUES
-                                            ('{userid}','0');
+                                            ('{user_id}','0');
                                             ''')
                             connection.commit()
-                        
-                        elif (user_type == 'Admin'):
-                            if secret_key == Config.SECRET_KEY:
-                                cursor.execute(f'''INSERT INTO Admin (AdminID)
-                                                VALUES
-                                                ('{userid}');
-                                                ''')
-                                connection.commit()
-                            else:
-                                st.error("Wrong secret key")
-                                st.stop()
 
-                        login_success(message=create_success_message, username=username, user_id=userid)
+
+
+                        login_success(message=create_success_message, username=username, user_id=user_id)
                     except Exception as err:
                         st.error(f'Register unsuccessful ')
-                        connection.rollback()
                         st.write(err)
 
         # Login to existing account
@@ -200,7 +182,6 @@ def login_form(
                     type="primary",
                 ):
 
-                    # TODO: Insert authentication logic for logging into an existing account using PostgreSQL.
                     cursor.execute('SELECT EXISTS(SELECT 1 FROM account WHERE username = %s);', (username,))
                     checked_user_exists = cursor.fetchone()[0]
 
@@ -226,5 +207,5 @@ def login_main():
     else:
         login_form(
             create_username_placeholder="Username will be visible in the global leaderboard.",
-            create_password_placeholder="⚠️ Password will be stored as plain text. You won't be able to recover it if you forget."
+            create_password_placeholder="⚠️ Password will be stored as plain text. You won't be able to recover it if you forget.",
         )
