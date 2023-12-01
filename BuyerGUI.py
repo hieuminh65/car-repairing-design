@@ -40,10 +40,10 @@ def BuyerMain():
     user_id = st.session_state.get("user_id", "default_user_id")
 
     db_params = {
-        "host": "localhost",
-        "database": "final_project",
-        "user": "postgres",
-        "password": "Toanposgre"
+        "host": Config.HOST,
+        "database": Config.DATABASE,
+        "user": Config.USER,
+        "password": Config.PASSWORD
     }
 
     connection = connect_db(db_params)
