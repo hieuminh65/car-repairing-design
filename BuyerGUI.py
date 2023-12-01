@@ -67,11 +67,10 @@ def BuyerMain():
         submit_button_car = st.form_submit_button(label='Buy Car')
 
         if submit_button_car:
-            # Transaction logic for buying a car
             try:
                 with connection.cursor() as cursor:
-                    sellerId = df_cars[df_cars['ucid'] == ucid_to_buy]['seller_aid']  # Placeholder, implement logic to obtain sellerId
-                    gcid = ucid_to_buy  # Placeholder, implement logic to obtain gcid
+                    sellerId = df_cars[df_cars['ucid'] == ucid_to_buy]['seller_aid']  
+                    gcid = ucid_to_buy 
                     cursor.execute("""
                         INSERT INTO transaction (buyerid, sellerid, gcid)
                         VALUES (%s, %s, %s);
@@ -86,12 +85,10 @@ def BuyerMain():
                 connection.rollback()
 
 
-    # Buy a Car Part
     with st.form(key='buy_part_form'):
         st.write("Buy a Car Part")
 
-        # part_id_to_buy is actually the UICD in carunchecked
-        part_id_to_buy = st.selectbox('Choose the ID of the part to buy:', df_parts['cid'].values.astype(int))  # Assuming there's a 'PartID' column
+        part_id_to_buy = st.selectbox('Choose the ID of the part to buy:', df_parts['cid'].values.astype(int))  
         submit_button_part = st.form_submit_button(label='Buy Part')
 
         if submit_button_part:
@@ -102,7 +99,7 @@ def BuyerMain():
                     cursor.execute("""
                         INSERT INTO transaction (buyerid, sellerid, gcid)
                         VALUES (%s, %s, %s);
-                    """, (int(user_id), int(sellerId),int(part_id_to_buy) ))  # Assuming you have a part_transaction table, adjust as needed
+                    """, (int(user_id), int(sellerId),int(part_id_to_buy) ))  
 
                     cursor.execute(f"DELETE FROM carparts WHERE cid = {int(part_id_to_buy)} ")
                     connection.commit()
@@ -113,8 +110,10 @@ def BuyerMain():
 
             finally:
                 st.experimental_rerun()
+                print()
 
     connection.close()
+
 
     back = st.button(":back:", type="secondary")
 

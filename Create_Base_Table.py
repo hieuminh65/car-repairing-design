@@ -1,8 +1,6 @@
 import psycopg2
 from config import Config
 
-    
-# Database connection parameters
 db_params = {
     "host": Config.HOST,
     "database": Config.DATABASE,
@@ -10,16 +8,13 @@ db_params = {
     "password": Config.PASSWORD
 }
 
-# Establish a connection to the PostgreSQL server
 connection = psycopg2.connect(**db_params)
 
-# Create a cursor object to interact with the database
 cursor = connection.cursor()
 
 
 def create_tables():
     try:
-        # SQL queries to create tables based on the provided schema
         queries = [
 
             # Account table
@@ -147,6 +142,11 @@ def create_tables():
 
     except (Exception, psycopg2.Error) as error:
         print("Error creating tables:", error)
+
+    finally:
+        if connection:
+            cursor.close()
+            connection.close()
 
 
 create_tables()
