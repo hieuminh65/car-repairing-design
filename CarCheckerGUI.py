@@ -53,7 +53,6 @@ def CarCheckerMain():
                         """)
         
                     else:
-                        st.write(f"ID {row['ucid']} is False. Do something else here.")
 
                         cursor.execute(f"""
                             INSERT INTO brokencar (ucid)
@@ -66,14 +65,11 @@ def CarCheckerMain():
         except Exception as e:
             st.error(f"Error: Unable to update the database. {e}")
 
-        finally:
-            st.experimental_rerun()
-
 
 
     back = st.button(":back:", type="secondary")
     if back:
         st.session_state["authenticated"] = False
         st.session_state["username"] = None
-        st.experimental_rerun()
+        st.rerun()
 

@@ -13,7 +13,6 @@ def SellerMain():
         "password": Config.PASSWORD
     }
 
-    # Setup a connection. Always remember to handle connection exceptions in production code
     try:
         connection = psycopg2.connect(**db_params)
     except Exception as e:
@@ -22,11 +21,9 @@ def SellerMain():
 
     st.title("Car Data Entry Form")
 
-    # Create a form
     with st.form(key='car_form'):
         st.write("Please enter the following details:")
 
-        # Collecting User Inputs
         description = st.text_area(label="Description", help="Enter a detailed description of the car.")
         model = st.text_input(label="Model", help="Enter the car model.")
         year = st.number_input(label="Year", min_value=1900, max_value=2023,
@@ -34,18 +31,15 @@ def SellerMain():
         status_options = ["New", "Used", "Damaged"]
         status = st.selectbox(label="Status", options=status_options, help="Select the current status of the car.")
 
-        # Submit Button
         submit_button = st.form_submit_button(label="Submit Car Data")
 
         if submit_button:
 
                 try:
                     with connection.cursor() as cursor:
-                        # Align the UCID sequence
                         align_sequence_query = "SELECT setval(pg_get_serial_sequence('carunchecked', 'ucid'), (SELECT COALESCE(MAX(UCID), 0) FROM CarUnchecked) + 1, false);"
                         cursor.execute(align_sequence_query)
 
-                        # Insert query
                         insert_query = '''INSERT INTO CarUnchecked (Description, Model, Year, Status, Seller_AID, uncheck)
                                           VALUES (%s, %s, %s, %s, %s, TRUE)
                                           RETURNING *;'''
@@ -53,7 +47,6 @@ def SellerMain():
 
                         latest_row = cursor.fetchone()
                         if latest_row is not None:
-                            # Process the latest_row data
                             connection.commit()
                             st.success("Data successfully inserted into the database.")
                         else:
@@ -65,4 +58,4 @@ def SellerMain():
     if back:
         st.session_state["authenticated"] = False
         st.session_state["username"] = None
-        st.experimental_rerun()
+        st.rerun()

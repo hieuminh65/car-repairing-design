@@ -4,7 +4,6 @@ from config import Config
 from SecurityCheck import check_password_strength, check_email
 
 
-## init database connection
 db_params = {
     "host": Config.HOST,
     "database": Config.DATABASE,
@@ -12,10 +11,8 @@ db_params = {
     "password": Config.PASSWORD
 }
 
-# Establish a connection to the PostgreSQL server
 connection = psycopg2.connect(**db_params)
 
-# Create a cursor object to interact with the database
 cursor = connection.cursor()
 
 
@@ -25,7 +22,7 @@ def login_success(message: str, username: str, user_id: int) -> None:
     st.session_state["username"] = username
     st.session_state['user_id'] = user_id
 
-    st.experimental_rerun()
+    st.rerun()
 
 
 def login_form(
@@ -33,8 +30,8 @@ def login_form(
     user_tablename: str = "users",
     username_col: str = "username",
     password_col: str = "password",
-    create_title: str = "Create new account :baby: ",
-    login_title: str = "Login to existing account :prince: ",
+    create_title: str = "Create new account",
+    login_title: str = "Login to existing account",
     allow_guest: bool = False,
     guest_title: str = "Guest login :ninja: ",
     create_username_label: str = "Create a unique username",
