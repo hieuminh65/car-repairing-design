@@ -113,11 +113,8 @@ def BuyerMain():
 
             finally:
                 st.experimental_rerun()
-                print()
 
     connection.close()
-
-
 
     back = st.button(":back:", type="secondary")
 

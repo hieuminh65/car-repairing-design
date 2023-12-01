@@ -1,6 +1,6 @@
 import streamlit as st
 import psycopg2
-
+from config import Config
 # login function
 from login import login_main
 from SellerGUI import SellerMain
@@ -10,10 +10,10 @@ from MechanicGUI import MechanicMain
 
 ## init database connection
 db_params = {
-    "host": "localhost",
-    "database": "final_project",
-    "user": "postgres",
-    "password": "Toanposgre"
+    "host": Config.HOST,
+    "database": Config.DATABASE,
+    "user": Config.USER,
+    "password": Config.PASSWORD
 }
 
 # Establish a connection to the PostgreSQL server

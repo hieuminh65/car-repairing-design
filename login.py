@@ -132,8 +132,6 @@ def login_form(
                                           RETURNING AID;''',
                                        (username, password, email, user_type))
 
-                        st.write(username, email, user_type)
-
                         user_id = cursor.fetchone()[0]
 
                         # add to the seller/buyer table

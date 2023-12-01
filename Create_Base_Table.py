@@ -126,8 +126,7 @@ def create_tables():
             RETURNS TRIGGER AS $$
             BEGIN
                 -- Grant SELECT privilege to the new admin user
-                EXECUTE 'GRANT SELECT ON ALL TABLES IN SCHEMA public TO ' || NEW.AdminID || ';'
-                RETURN NEW;
+                EXECUTE 'GRANT SELECT ON ALL TABLES IN SCHEMA public TO ' || quote_ident(NEW.AdminID::text) || ';';
             END;
             $$ LANGUAGE plpgsql;
             '''
@@ -149,10 +148,5 @@ def create_tables():
     except (Exception, psycopg2.Error) as error:
         print("Error creating tables:", error)
 
-    finally:
-        # Close the cursor and the database connection
-        if connection:
-            cursor.close()
-            connection.close()
 
 create_tables()
