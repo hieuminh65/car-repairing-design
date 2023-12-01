@@ -40,8 +40,6 @@ def login_form(
     password_col: str = "password",
     create_title: str = "Create new account",
     login_title: str = "Login to existing account",
-    allow_guest: bool = True,
-    guest_title: str = "Guest login",
     create_username_label: str = "Create a unique username",
     create_email_label: str = "Create a unique email",
     create_email_placeholder: str = "Create a unique email",
@@ -61,7 +59,6 @@ def login_form(
     login_submit_label: str = "Login",
     login_success_message: str = "Login succeeded :tada:",
     login_error_message: str = "Wrong username/password :x: ",
-    guest_submit_label: str = "Guest login",
 ) -> None:
     """Creates a user login form in Streamlit apps.
 
@@ -77,21 +74,12 @@ def login_form(
         st.session_state["username"] = None
 
     with st.expander(title, expanded=not st.session_state["authenticated"]):
-        if allow_guest:
-            create_tab, login_tab, guest_tab = st.tabs(
-                [
-                    create_title,
-                    login_title,
-                    guest_title,
-                ]
-            )
-        else:
-            create_tab, login_tab = st.tabs(
-                [
-                    create_title,
-                    login_title,
-                ]
-            )
+        create_tab, login_tab = st.tabs(
+            [
+                create_title,
+                login_title,
+            ]
+        )
 
         # Create new account
         with create_tab:
@@ -142,10 +130,10 @@ def login_form(
                         st.stop()
                         
                     try:
-                        cursor.execute(f'''INSERT INTO account (username, password, email, type)
-                                        VALUES
-                                        ('{username}', '{password}', '{email}', '{user_type}');
-                                        ''')
+                        cursor.execute('''INSERT INTO account (username, password, email, type)
+                                        VALUES (%s, %s, %s, %s)
+                                        RETURNING AID;''',
+                                    (username, password, email, user_type))
                         
                         # connection.commit()
 
@@ -232,23 +220,11 @@ def login_form(
 
                             login_success(login_success_message, username, user_id=user_id )
 
-        # Guest login
-        if allow_guest:
-            with guest_tab:
-                if st.button(
-                    label=guest_submit_label,
-                    type="primary",
-                    disabled=st.session_state["authenticated"],
-                ):
-                    st.session_state["authenticated"] = True
-
-
 def login_main():
     if st.session_state['authenticated'] == True and st.session_state["username"] is not None:
         st.write(f'Welcome back, {st.session_state["username"]}')
     else:
         login_form(
             create_username_placeholder="Username will be visible in the global leaderboard.",
-            create_password_placeholder="⚠️ Password will be stored as plain text. You won't be able to recover it if you forget.",
-            guest_submit_label="Play as a guest ⚠️ Scores won't be saved",
+            create_password_placeholder="⚠️ Password will be stored as plain text. You won't be able to recover it if you forget."
         )
