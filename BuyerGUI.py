@@ -57,7 +57,8 @@ def BuyerMain():
             st.subheader("Available Car Parts")
             df_parts = fetch_and_display_table(cursor, "carparts")
     except Exception as e:
-        st.error(f"Error: Unable to fetch data from the database. {e}")
+        st.error(f"Error: Unable to fetch data from the database.")
+        print(e)
         st.stop()
 
     # Buy a Car
@@ -81,7 +82,8 @@ def BuyerMain():
                     st.success(f"You have successfully purchased the car with UCID {ucid_to_buy}.")
                     st.experimental_rerun()
             except Exception as e:
-                st.error(f"Error: Unable to complete the purchase. {e}")
+                st.error(f"Error: Unable to fetch data from the database.")
+                print(e)
                 connection.rollback()
 
 
@@ -105,7 +107,8 @@ def BuyerMain():
                     connection.commit()
                     st.success(f"You have successfully purchased the part with ID {part_id_to_buy}.")
             except Exception as e:
-                st.error(f"Error: Unable to complete the purchase. {e}")
+                st.error(f"Error: Unable to fetch data from the database.")
+                print(e)
                 connection.rollback()
 
             finally:

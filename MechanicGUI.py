@@ -23,14 +23,6 @@ def MechanicMain():
     st.title("Mechanic View")
 
     try:
-        connection = psycopg2.connect(**db_params)
-    except Exception as e:
-        st.error(f"Error: Unable to connect to the database. {e}")
-        st.stop()
-
-    st.title("Mechanic View")
-
-    try:
         with connection.cursor() as cursor:
             cursor.execute("SELECT carunchecked.ucid, carunchecked.description, carunchecked.model, carunchecked.year, carunchecked.status FROM brokencar JOIN carunchecked on brokencar.UCID = carunchecked.UCID;")
             data = cursor.fetchall()
@@ -54,7 +46,6 @@ def MechanicMain():
                 for index, row in edited_df.iterrows():
                     
                     if row['isFixable']:
-                        st.write(f"ID {row['ucid']} is True. Do something here.")
                         
                         cursor.execute(f"""
                             INSERT INTO greatcar (ucid)
@@ -93,7 +84,6 @@ def MechanicMain():
 
         finally:
             print()
-            st.experimental_rerun()
 
     back = st.button(":back:", type="secondary")
     if back:

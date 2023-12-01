@@ -53,7 +53,6 @@ def CarCheckerMain():
                         """)
         
                     else:
-                        st.write(f"ID {row['ucid']} is False. Do something else here.")
 
                         cursor.execute(f"""
                             INSERT INTO brokencar (ucid)
@@ -65,9 +64,6 @@ def CarCheckerMain():
 
         except Exception as e:
             st.error(f"Error: Unable to update the database. {e}")
-
-        finally:
-            st.experimental_rerun()
 
 
 
