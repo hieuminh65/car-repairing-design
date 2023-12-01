@@ -6,3 +6,8 @@
 ```bash
 pip install -r requirements.txt
 ```
+
+## Tech Stack
+- Python
+- Streamlit
+- Azure Postgres SQL Database

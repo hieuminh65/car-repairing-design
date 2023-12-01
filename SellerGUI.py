@@ -38,6 +38,7 @@ def SellerMain():
         submit_button = st.form_submit_button(label="Submit Car Data")
 
         if submit_button:
+
                 try:
                     with connection.cursor() as cursor:
                         # Align the UCID sequence

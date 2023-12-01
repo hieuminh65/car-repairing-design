@@ -1,8 +1,8 @@
 import streamlit as st
 import psycopg2
 from config import Config
-# check password strength
-from SecurityCheck import check_password_strength
+from SecurityCheck import check_password_strength, check_email
+
 
 ## init database connection
 db_params = {
@@ -56,7 +56,6 @@ def login_form(
     login_submit_label: str = "Login",
     login_success_message: str = "Login succeeded :tada:",
     login_error_message: str = "Wrong username/password :x: ",
-    guest_submit_label: str = "Guest login",
 ) -> None:
     """Creates a user login form in Streamlit apps.
 
@@ -72,21 +71,12 @@ def login_form(
         st.session_state["username"] = None
 
     with st.expander(title, expanded=not st.session_state["authenticated"]):
-        if allow_guest:
-            create_tab, login_tab, guest_tab = st.tabs(
-                [
-                    create_title,
-                    login_title,
-                    guest_title,
-                ]
-            )
-        else:
-            create_tab, login_tab = st.tabs(
-                [
-                    create_title,
-                    login_title,
-                ]
-            )
+        create_tab, login_tab = st.tabs(
+            [
+                create_title,
+                login_title,
+            ]
+        )
 
         # Create new account
         with create_tab:
@@ -125,14 +115,19 @@ def login_form(
                     label=create_submit_label,
                     type="primary",
                     disabled=st.session_state["authenticated"],
-                ):
+                ):  
+                    if email == '' or not check_email(email):
+                        st.error("Please fill in your correct email")
+                        st.stop()
+
                     if not check_password_strength(password):
-                        st.toast('Please use a stronger password!', icon="🚨")
+                        st.error('Please use a stronger password with at least 8 characters long, 1 alphabets, 1 numbers, and 1 special character', icon="🚨")
                         st.stop()
 
                     # TODO: Insert authentication logic for creating a new account using PostgreSQL.
                     try:
                         cursor.execute('''INSERT INTO account (username, password, email, type)
+
                                           VALUES (%s, %s, %s, %s)
                                           RETURNING AID;''',
                                        (username, password, email, user_type))
@@ -205,17 +200,6 @@ def login_form(
                             user_id = cursor.fetchone()[0]
 
                             login_success(login_success_message, username, user_id=user_id )
-
-        # Guest login
-        if allow_guest:
-            with guest_tab:
-                if st.button(
-                    label=guest_submit_label,
-                    type="primary",
-                    disabled=st.session_state["authenticated"],
-                ):
-                    st.session_state["authenticated"] = True
-
 
 def login_main():
     if st.session_state['authenticated'] == True and st.session_state["username"] is not None:
