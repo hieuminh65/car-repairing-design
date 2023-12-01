@@ -25,7 +25,7 @@ def login_success(message: str, username: str, user_id: int) -> None:
     st.session_state["username"] = username
     st.session_state['user_id'] = user_id
 
-    st.experimental_rerun()
+    st.rerun()
 
 
 def login_form(

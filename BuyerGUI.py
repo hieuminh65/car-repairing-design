@@ -70,17 +70,16 @@ def BuyerMain():
         if submit_button_car:
             try:
                 with connection.cursor() as cursor:
-                    sellerId = df_cars[df_cars['ucid'] == ucid_to_buy]['seller_aid']  
-                    gcid = ucid_to_buy 
+                    sellerId = df_cars[df_cars['ucid'] == ucid_to_buy]['seller_aid'].iloc[0]  
+                    gcid = ucid_to_buy
                     cursor.execute("""
                         INSERT INTO transaction (buyerid, sellerid, gcid)
                         VALUES (%s, %s, %s);
                     """, (int(user_id), int(sellerId), int(gcid)))
 
-                    cursor.execute(f"DELETE FROM greatcar WHERE UCID = {int(ucid_to_buy)} ")
+                    cursor.execute("DELETE FROM greatcar WHERE UCID = %s", (int(ucid_to_buy),)) 
                     connection.commit()
                     st.success(f"You have successfully purchased the car with UCID {ucid_to_buy}.")
-                    st.experimental_rerun()
             except Exception as e:
                 st.error(f"Error: Unable to fetch data from the database.")
                 print(e)
@@ -94,16 +93,16 @@ def BuyerMain():
         submit_button_part = st.form_submit_button(label='Buy Part')
 
         if submit_button_part:
-            # Transaction logic for buying a part
-            sellerId = df_parts[df_parts['cid'] == part_id_to_buy]['seller_aid']
             try:
                 with connection.cursor() as cursor:
+                    sellerId = df_parts[df_parts['cid'] == part_id_to_buy]['seller_aid'].iloc[0]
+
                     cursor.execute("""
                         INSERT INTO transaction (buyerid, sellerid, gcid)
                         VALUES (%s, %s, %s);
-                    """, (int(user_id), int(sellerId),int(part_id_to_buy) ))  
+                    """, (int(user_id), int(sellerId), int(part_id_to_buy)))
 
-                    cursor.execute(f"DELETE FROM carparts WHERE cid = {int(part_id_to_buy)} ")
+                    cursor.execute("DELETE FROM carparts WHERE cid = %s", (int(part_id_to_buy),))
                     connection.commit()
                     st.success(f"You have successfully purchased the part with ID {part_id_to_buy}.")
             except Exception as e:
@@ -112,7 +111,7 @@ def BuyerMain():
                 connection.rollback()
 
             finally:
-                st.experimental_rerun()
+                st.rerun()
                 print()
 
     connection.close()
@@ -123,4 +122,4 @@ def BuyerMain():
     if back:
         st.session_state["authenticated"] = False
         st.session_state["username"] = None
-        st.experimental_rerun()
+        st.rerun()

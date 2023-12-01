@@ -89,5 +89,5 @@ def MechanicMain():
     if back:
         st.session_state["authenticated"] = False
         st.session_state["username"] = None
-        st.experimental_rerun()
+        st.rerun()
 
